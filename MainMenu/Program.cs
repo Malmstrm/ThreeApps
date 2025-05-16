@@ -1,33 +1,32 @@
-﻿using Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Application.Interfaces;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 
 var host = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration(config =>
+    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+    .ConfigureContainer<ContainerBuilder>(builder =>
     {
-        config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-    })
-    .ConfigureServices((context, services) =>
-    {
-        var connectionString = context.Configuration.GetConnectionString("DefaultConnection");
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        //builder.RegisterType<ShapeApp.ShapeApplication>().Named<IApp>("shape");
+        //builder.RegisterType<Calculator.CalculatorApplication>().Named<IApp>("calculator");
+        //builder.RegisterType<RPS.RpsApplication>().Named<IApp>("rps");
     })
     .Build();
 
-// Kör din MainMenu eller app-hantering här
 using var scope = host.Services.CreateScope();
-var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+var container = (ILifetimeScope)scope.ServiceProvider.GetService(typeof(ILifetimeScope));
 
-// EXEMPEL: Kontrollera att DB är uppe
-if (db.Database.CanConnect())
+// Enkelt menyval i Console
+Console.WriteLine("Vilken app vill du köra? (shape/calculator/rps)");
+var input = Console.ReadLine()?.ToLower();
+
+if (!string.IsNullOrWhiteSpace(input) && container.IsRegisteredWithName<IApp>(input))
 {
-    Console.WriteLine("Databaskoppling OK!");
+    var app = container.ResolveNamed<IApp>(input);
+    app.Run();
 }
 else
 {
-    Console.WriteLine("Kunde inte ansluta till databasen.");
+    Console.WriteLine("Ogiltigt val, program avslutas.");
 }
