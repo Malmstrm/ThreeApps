@@ -1,4 +1,5 @@
 ﻿using Domain.Commons;
+using Shared.Enums;
 
 namespace Domain.Entities
 {
