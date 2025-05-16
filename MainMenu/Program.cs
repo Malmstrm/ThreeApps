@@ -13,11 +13,8 @@ var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((context, services) =>
     {
         var connectionString = context.Configuration.GetConnectionString("DefaultConnection");
-
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
-
-        // Registrera andra services här om du har några
     })
     .Build();
 
