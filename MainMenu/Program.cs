@@ -1,32 +1,46 @@
 ﻿using Application.Interfaces;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Shared.Interfaces;
+using Shared.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 var host = Host.CreateDefaultBuilder(args)
     .UseServiceProviderFactory(new AutofacServiceProviderFactory())
     .ConfigureContainer<ContainerBuilder>(builder =>
     {
-        //builder.RegisterType<ShapeApp.ShapeApplication>().Named<IApp>("shape");
-        //builder.RegisterType<Calculator.CalculatorApplication>().Named<IApp>("calculator");
-        //builder.RegisterType<RPS.RpsApplication>().Named<IApp>("rps");
+        // Register Shared Services
+        builder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
+
+        // Register Apps
+        //builder.RegisterType<ShapeApplication>().Named<IApp>("shape");
+        //builder.RegisterType<CalculatorApplication>().Named<IApp>("calculator");
+        //builder.RegisterType<RpsApplication>().Named<IApp>("rps");
     })
     .Build();
 
 using var scope = host.Services.CreateScope();
 var container = (ILifetimeScope)scope.ServiceProvider.GetService(typeof(ILifetimeScope));
 
-// Enkelt menyval i Console
-Console.WriteLine("Vilken app vill du köra? (shape/calculator/rps)");
-var input = Console.ReadLine()?.ToLower();
+// Get Navigation Service
+var navigation = container.Resolve<INavigationService>();
 
-if (!string.IsNullOrWhiteSpace(input) && container.IsRegisteredWithName<IApp>(input))
-{
-    var app = container.ResolveNamed<IApp>(input);
-    app.Run();
-}
-else
-{
-    Console.WriteLine("Ogiltigt val, program avslutas.");
-}
+// Display Main Menu with Arrows
+var selectedApp = navigation.NavigateWithArrows(
+    "Välj vilken app du vill köra:",
+    "shape",
+    "calculator",
+    "rps"
+);
+
+// Run the selected app
+//if (container.IsRegisteredWithName<IApp>(selectedApp))
+//{
+//    var app = container.ResolveNamed<IApp>(selectedApp);
+//    app.Run();
+//}
+//else
+//{
+//    Console.WriteLine("Ogiltigt val, program avslutas.");
+//}

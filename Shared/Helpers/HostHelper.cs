@@ -3,6 +3,7 @@ using Autofac;
 using Microsoft.Extensions.Hosting;
 using Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Shared.Services;
 
 namespace Shared.Helpers;
 
