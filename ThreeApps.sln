@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{AB7E03A1-6
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainMenu", "MainMenu\MainMenu.csproj", "{54781976-CEBB-495C-9D43-6505D17F88D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPS", "RPS\RPS.csproj", "{712DC632-540E-44DA-870B-E79F63172BBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{54781976-CEBB-495C-9D43-6505D17F88D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{54781976-CEBB-495C-9D43-6505D17F88D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{54781976-CEBB-495C-9D43-6505D17F88D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{712DC632-540E-44DA-870B-E79F63172BBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{712DC632-540E-44DA-870B-E79F63172BBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{712DC632-540E-44DA-870B-E79F63172BBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{712DC632-540E-44DA-870B-E79F63172BBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -26,5 +32,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{AB7E03A1-61B4-4977-9343-137B5D247ABD} = {6EDA76F7-A816-41BB-A4EC-FC967C96C590}
 		{54781976-CEBB-495C-9D43-6505D17F88D8} = {6EDA76F7-A816-41BB-A4EC-FC967C96C590}
+		{712DC632-540E-44DA-870B-E79F63172BBE} = {6EDA76F7-A816-41BB-A4EC-FC967C96C590}
 	EndGlobalSection
 EndGlobal
