@@ -1,6 +1,6 @@
 ﻿namespace Application.Interfaces;
 
-public interface IApp
+public interface IApplication
 {
     void Run();
 }
