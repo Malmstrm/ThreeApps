@@ -53,6 +53,7 @@ public class MenuRunner
                 break;
             }
 
+
             // Determine App Key and Loading Time
             var (appKey, loadingTime) = selectedApp.ToLower() switch
             {
@@ -62,7 +63,15 @@ public class MenuRunner
                 _ => (null, 1000)
             };
 
-            if (appKey != null && _container.IsRegisteredWithName<IApp>(appKey))
+            if (appKey == "rps")
+            {
+                AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
+                MenuHelper.ShowLoading("Loading application...", loadingTime);
+
+                var rpsRunner = _container.Resolve<RPS.RpsRunner>();
+                rpsRunner.Run();
+            }
+            else if (appKey != null && _container.IsRegisteredWithName<IApp>(appKey))
             {
                 AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
                 MenuHelper.ShowLoading("Loading application...", loadingTime);

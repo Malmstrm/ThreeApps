@@ -9,19 +9,18 @@ namespace Shared.Helpers;
 
 public static class HostHelper
 {
-    public static IApp BuildAndRun<TApp>() where TApp : class, IApp
+    public static IApp BuildAndRun<TApp>() where TApp : class
     {
         var host = Host.CreateDefaultBuilder()
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
             .ConfigureContainer<ContainerBuilder>(builder =>
             {
-                // Registrera NavigationService + Spectre.Console helpers
                 builder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
-                builder.RegisterType<TApp>().As<IApp>();
+                builder.RegisterType<TApp>().AsSelf();
             })
             .Build();
 
         using var scope = host.Services.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<IApp>();
+        return scope.ServiceProvider.GetRequiredService<TApp>() as IApp;
     }
 }

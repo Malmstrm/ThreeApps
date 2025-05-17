@@ -18,6 +18,7 @@ var host = Host.CreateDefaultBuilder(args)
 
         // Registrera MenuRunner i DI
         builder.RegisterType<MenuRunner>().AsSelf();
+        builder.RegisterType<RPS.RpsRunner>().AsSelf();
     })
     .Build();
 

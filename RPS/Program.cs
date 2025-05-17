@@ -1,10 +1,4 @@
-﻿namespace RPS
-{
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
-    }
-}
+﻿using RPS;
+using Shared.Helpers;
+
+HostHelper.BuildAndRun<RpsRunner>().Run();
