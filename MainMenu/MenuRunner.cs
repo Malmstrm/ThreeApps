@@ -1,4 +1,7 @@
-﻿using Autofac;
+﻿using Application.Interfaces;
+using Autofac;
+using Shared;
+using Shared.Helpers;
 using Shared.Interfaces;
 using Spectre.Console;
 
@@ -33,37 +36,37 @@ public class MenuRunner
                 .Padding(1, 1)
                 .Expand());
 
-            // Menu Selection
+            // Menu Selection (Plain Text)
             var selectedApp = _navigation.NavigateWithArrows(
                 "Select an option:",
-                "🎮  Rock, Paper & Scissors",
-                "📐  Shape Calculator",
-                "🧮  Calculator",
-                "❌  Exit"
+                "RPS - Rock, Paper & Scissors",
+                "Shape - Shape Calculator",
+                "Calc - Calculator",
+                "Exit - Exit"
             );
 
             if (selectedApp.Contains("Exit"))
             {
                 AnsiConsole.MarkupLine("\n[green]Exiting application. Goodbye![/]");
                 AnsiConsole.Write(new Rule("[yellow]Thank you for using ThreeApps![/]").Centered());
-                Thread.Sleep(1000); // Liten delay för att användaren ska hinna se det
+                Thread.Sleep(1000);
                 break;
             }
 
-            // Visual Feedback
-            AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
-            Thread.Sleep(700);
-
-            var appKey = selectedApp.ToLower() switch
+            // Determine App Key and Loading Time
+            var (appKey, loadingTime) = selectedApp.ToLower() switch
             {
-                var s when s.Contains("rock") => "rps",
-                var s when s.Contains("shape") => "shape",
-                var s when s.Contains("calculator") => "calculator",
-                _ => null
+                var s when s.Contains("rps") => ("rps", 1000),
+                var s when s.Contains("shape") => ("shape", 1500),
+                var s when s.Contains("calc") => ("calculator", 2000),
+                _ => (null, 1000)
             };
 
             if (appKey != null && _container.IsRegisteredWithName<IApp>(appKey))
             {
+                AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
+                MenuHelper.ShowLoading("Loading application...", loadingTime);
+
                 var app = _container.ResolveNamed<IApp>(appKey);
                 app.Run();
             }
