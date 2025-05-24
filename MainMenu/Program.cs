@@ -10,6 +10,7 @@ using Application.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace MainMenu;
 
@@ -20,6 +21,16 @@ class Program
         var host = Host.CreateDefaultBuilder(args)
             // Byt ut MS-DI mot Autofac som kontainer
             .UseServiceProviderFactory(new AutofacServiceProviderFactory())
+
+                .ConfigureLogging(logging =>
+                {
+                    // Behåll gärna konsolloggern för din egen kod:
+                    logging.ClearProviders();
+                    logging.AddConsole();
+
+                    // Tystar all EF Core-loggning:
+                    logging.AddFilter("Microsoft.EntityFrameworkCore", LogLevel.None);
+                })
 
             // 1) Registrera "framework"-tjänster i MS-DI
             .ConfigureServices((ctx, services) =>

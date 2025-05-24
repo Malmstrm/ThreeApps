@@ -70,11 +70,11 @@ namespace RPS
             var history = _service.GetHistoryAsync().Result;
 
             // Bygg och skriv ut tabell
-            var table = new Table().AddColumns("Time", "You", "CPU", "Result");
+            var table = new Table().AddColumns("Date", "You", "CPU", "Result");
             foreach (var g in history)
             {
                 table.AddRow(
-                    g.PlayedAt.ToLocalTime().ToString("g"),
+                    g.PlayedAt.ToString("yyyy-MM-dd"),
                     g.PlayerMove.ToString(),
                     g.ComputerMove.ToString(),
                     g.Outcome.ToString());
