@@ -1,30 +1,67 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using Shared.Interfaces;
 using Shared.Services;
-using MainMenu;
-using Microsoft.Extensions.DependencyInjection;
+using Application.Interfaces;
+using Application.Services;
+using Infrastructure.Data;
+using Infrastructure.Repositories;
+using Microsoft.Extensions.Configuration;
 
-var host = Host.CreateDefaultBuilder(args)
-    .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-    .ConfigureContainer<ContainerBuilder>(builder =>
+namespace MainMenu;
+
+class Program
+{
+    static void Main(string[] args)
     {
-        builder.RegisterType<NavigationService>().As<INavigationService>().SingleInstance();
+        var host = Host.CreateDefaultBuilder(args)
+            // Byt ut MS-DI mot Autofac som kontainer
+            .UseServiceProviderFactory(new AutofacServiceProviderFactory())
 
-        //builder.RegisterType<ShapeApplication>().Named<IApp>("shape");
-        //builder.RegisterType<CalculatorApplication>().Named<IApp>("calculator");
-        //builder.RegisterType<RpsApplication>().Named<IApp>("rps");
+            // 1) Registrera "framework"-tjänster i MS-DI
+            .ConfigureServices((ctx, services) =>
+            {
+                // a) EF Core: DbContext + anslutning
+                var connString = ctx.Configuration.GetConnectionString("DefaultConnection");
+                services.AddDbContext<AppDbContext>(opts =>
+                    opts.UseSqlServer(connString));
 
-        // Registrera MenuRunner i DI
-        builder.RegisterType<MenuRunner>().AsSelf();
-        builder.RegisterType<RPS.RpsRunner>().AsSelf();
-    })
-    .Build();
+                // b) AutoMapper: scanna alla mapping-profiler i Core.Application
+                services.AddAutoMapper(typeof(Application.MappingProfiles.RpsMappingProfile).Assembly);
+            })
 
-using var scope = host.Services.CreateScope();
-var container = (ILifetimeScope)scope.ServiceProvider.GetService(typeof(ILifetimeScope));
+            // 2) Registrera dina egna implementationer i Autofac
+            .ConfigureContainer<ContainerBuilder>(builder =>
+            {
+                // a) NavigationService från Shared
+                builder
+                    .RegisterType<NavigationService>()
+                    .As<INavigationService>()
+                    .SingleInstance();
 
-// Hämta MenuRunner via DI och kör
-var menu = container.Resolve<MenuRunner>();
-menu.Run();
+                // b) RPS: Repository + Service
+                builder
+                    .RegisterType<RpsRepository>()
+                    .As<IRpsRepository>()
+                    .InstancePerLifetimeScope();
+                builder
+                    .RegisterType<RpsService>()
+                    .As<IRpsService>()
+                    .InstancePerLifetimeScope();
+
+                // c) Console-apparna själva
+                builder.RegisterType<MenuRunner>().AsSelf();
+                builder.RegisterType<RPS.RpsRunner>().AsSelf();
+                // (du kan även registrera ShapeRunner, CalcRunner etc här)
+            })
+            .Build();
+
+        // Skapa scope och kör huvudmenyn
+        using var scope = host.Services.CreateScope();
+        var menu = scope.ServiceProvider.GetRequiredService<MenuRunner>();
+        menu.Run();
+    }
+}
