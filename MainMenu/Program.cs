@@ -69,6 +69,11 @@ class Program
                 // (du kan även registrera ShapeRunner, CalcRunner etc här)
             })
             .Build();
+        using (var migScope = host.Services.CreateScope())
+        {
+            var db = migScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            db.Database.Migrate();
+        }
 
         // Skapa scope och kör huvudmenyn
         using var scope = host.Services.CreateScope();

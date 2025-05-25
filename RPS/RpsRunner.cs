@@ -66,22 +66,43 @@ namespace RPS
 
         private void ShowHistory()
         {
-            // Hämta historik
-            var history = _service.GetHistoryAsync().Result;
+            // 1) Hämta och sortera historiken kronologiskt
+            var history = _service.GetHistoryAsync().Result
+                                  .OrderBy(g => g.PlayedAt)
+                                  .ToList();
 
-            // Bygg och skriv ut tabell
-            var table = new Table().AddColumns("Date", "You", "CPU", "Result");
+            // 2) Lägg till en extra kolumn "Games" före win%-kolumnen
+            var table = new Table()
+                .AddColumns("Date", "You", "CPU", "Result", "Games", "Win %");
+
+            int total = 0;
+            int wins = 0;
+
+            // 3) Fyll på rad-för-rad
             foreach (var g in history)
             {
+                total++;
+                if (g.Outcome == GameOutcome.Win)
+                    wins++;
+
+                double rate = (double)wins / total;
+
                 table.AddRow(
-                    g.PlayedAt.ToString("yyyy-MM-dd"),
+                    g.PlayedAt.ToString("d"),
                     g.PlayerMove.ToString(),
                     g.ComputerMove.ToString(),
-                    g.Outcome.ToString());
+                    g.Outcome.ToString(),
+                    total.ToString(),         // <-- Antal spel hittills
+                    rate.ToString("P1")       // <-- Kumulativ win%
+                );
             }
+
+            // 4) Rendera tabellen
             AnsiConsole.Write(table);
             Console.ReadKey();
         }
+
+
 
         private static void ShowHeader() =>
             AnsiConsole.Write(
