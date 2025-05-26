@@ -9,8 +9,10 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddRps(this IServiceCollection services)
     {
-        services.AddScoped<IRpsRepository, RpsRepository>();
-        services.AddScoped<IRpsService, RpsService>();
+        services.AddTransient<IRpsRepository, RpsRepository>();
+        services.AddTransient<IRpsService, RpsService>();
+        services.AddTransient<ICalculatorRepository, CalculatorRepository>();
+        services.AddTransient<ICalculatorService, ICalculatorService>();
         return services;
     }
 }
