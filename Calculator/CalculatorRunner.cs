@@ -6,7 +6,7 @@ using Spectre.Console;
 
 namespace Calculator;
 
-public class CalculatorRunner : IApp
+public class CalculatorRunner
 {
     private readonly INavigationService _nav;
     private readonly ICalculatorService _calc;

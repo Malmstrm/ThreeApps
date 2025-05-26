@@ -3,7 +3,6 @@ using Application.Interfaces;
 using AutoMapper;
 using Domain.Entities;
 using Shared.Enums;
-using System.Security.Cryptography.X509Certificates;
 
 namespace Application.Services;
 

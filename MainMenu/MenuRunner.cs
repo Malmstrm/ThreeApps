@@ -1,6 +1,4 @@
-﻿using Application.Interfaces;
-using Autofac;
-using Shared;
+﻿using Autofac;
 using Shared.Helpers;
 using Shared.Interfaces;
 using Spectre.Console;
@@ -59,7 +57,7 @@ public class MenuRunner
             {
                 var s when s.Contains("rps") => ("rps", 1000),
                 var s when s.Contains("shape") => ("shape", 1500),
-                var s when s.Contains("calc") => ("calculator", 2000),
+                var s when s.Contains("calc") => ("calc", 2000),
                 _ => (null, 1000)
             };
 
@@ -70,6 +68,14 @@ public class MenuRunner
 
                 var rpsRunner = _container.Resolve<RPS.RpsRunner>();
                 rpsRunner.Run();
+            }
+            else if (appKey == "calc")
+            {
+                AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
+                MenuHelper.ShowLoading("Loading application...", loadingTime);
+
+                var calcRunner = _container.Resolve<Calculator.CalculatorRunner>();
+                calcRunner.Run();
             }
             else if (appKey != null && _container.IsRegisteredWithName<IApp>(appKey))
             {

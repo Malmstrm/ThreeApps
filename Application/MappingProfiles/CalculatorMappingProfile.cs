@@ -9,6 +9,15 @@ public class CalculatorMappingProfile : Profile
     public CalculatorMappingProfile() 
     {
         CreateMap<CalculatorCalculation, CalculationDTO>()
-            .ForMember(d => d.Date, opt => opt.MapFrom(s => s.CreatedAt)); // Om CreatedAt är DateOnly → DateOnly→DateOnly, annars DateTime→DateTime
+            // mappa om FirstValue → Operand1
+            .ForMember(dest => dest.Operand1,
+                       opt => opt.MapFrom(src => src.FirstValue))
+            // SecondValue → Operand2
+            .ForMember(dest => dest.Operand2,
+                       opt => opt.MapFrom(src => src.SecondValue))
+            // Operator & Result heter samma namn, de mappas automatiskt
+            // mappa CreatedAt → Date
+            .ForMember(dest => dest.Date,
+                       opt => opt.MapFrom(src => src.CreatedAt));
     }
 }

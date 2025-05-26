@@ -11,6 +11,8 @@ using Infrastructure.Data;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Calculator;
+using RPS;
 
 namespace MainMenu;
 
@@ -42,6 +44,7 @@ class Program
 
                 // b) AutoMapper: scanna alla mapping-profiler i Core.Application
                 services.AddAutoMapper(typeof(Application.MappingProfiles.RpsMappingProfile).Assembly);
+                services.AddAutoMapper(typeof(Application.MappingProfiles.CalculatorMappingProfile).Assembly);
             })
 
             // 2) Registrera dina egna implementationer i Autofac
@@ -53,7 +56,7 @@ class Program
                     .As<INavigationService>()
                     .SingleInstance();
 
-                // b) RPS: Repository + Service
+                // b) Repository + Service
                 builder
                     .RegisterType<RpsRepository>()
                     .As<IRpsRepository>()
@@ -62,10 +65,19 @@ class Program
                     .RegisterType<RpsService>()
                     .As<IRpsService>()
                     .InstancePerLifetimeScope();
+                builder
+                    .RegisterType<CalculationService>()
+                    .As<ICalculatorService>()
+                    .InstancePerLifetimeScope();
+                builder
+                    .RegisterType<CalculatorRepository>()
+                    .As<ICalculatorRepository>()
+                    .InstancePerLifetimeScope();
 
                 // c) Console-apparna själva
                 builder.RegisterType<MenuRunner>().AsSelf();
-                builder.RegisterType<RPS.RpsRunner>().AsSelf();
+                builder.RegisterType<RpsRunner>().AsSelf();
+                builder.RegisterType<CalculatorRunner>().AsSelf();
                 // (du kan även registrera ShapeRunner, CalcRunner etc här)
             })
             .Build();

@@ -1,10 +1,4 @@
-﻿namespace Calculator
-{
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
-    }
-}
+﻿using Calculator;
+using Shared.Helpers;
+
+HostHelper.BuildAndRun<CalculatorRunner>().Run();
