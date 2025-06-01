@@ -1,10 +1,11 @@
-﻿namespace Shape
+﻿using Shared.Helpers;
+
+namespace Shape;
+
+public class Program
 {
-    internal class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
+        HostHelper.BuildAndRun<ShapeRunner>().Run();
     }
 }
