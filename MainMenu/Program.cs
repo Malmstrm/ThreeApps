@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Calculator;
 using RPS;
+using Shape;
 
 namespace MainMenu;
 
@@ -45,6 +46,7 @@ class Program
                 // b) AutoMapper: scanna alla mapping-profiler i Core.Application
                 services.AddAutoMapper(typeof(Application.MappingProfiles.RpsMappingProfile).Assembly);
                 services.AddAutoMapper(typeof(Application.MappingProfiles.CalculatorMappingProfile).Assembly);
+                services.AddAutoMapper(typeof(Application.MappingProfiles.ShapeMappingProfile).Assembly);
             })
 
             // 2) Registrera dina egna implementationer i Autofac
@@ -73,11 +75,20 @@ class Program
                     .RegisterType<CalculatorRepository>()
                     .As<ICalculatorRepository>()
                     .InstancePerLifetimeScope();
+                builder
+                    .RegisterType<ShapeRepository>()
+                    .As<ICalculatorRepository>()
+                    .InstancePerLifetimeScope();
+                builder
+                    .RegisterType<CalculationService>()
+                    .As<ICalculatorService>()
+                    .InstancePerLifetimeScope ();
 
                 // c) Console-apparna själva
                 builder.RegisterType<MenuRunner>().AsSelf();
                 builder.RegisterType<RpsRunner>().AsSelf();
                 builder.RegisterType<CalculatorRunner>().AsSelf();
+                builder.RegisterType<ShapeRunner>().AsSelf();
                 // (du kan även registrera ShapeRunner, CalcRunner etc här)
             })
             .Build();
