@@ -13,6 +13,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRpsService, RpsService>();
         services.AddTransient<ICalculatorRepository, CalculatorRepository>();
         services.AddTransient<ICalculatorService, CalculationService>();
+        services.AddTransient<IShapeRepository, ShapeRepository>();
+        services.AddTransient<IShapeService, ShapeService>();
         return services;
     }
 }

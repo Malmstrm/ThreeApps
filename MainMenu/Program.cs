@@ -77,11 +77,11 @@ class Program
                     .InstancePerLifetimeScope();
                 builder
                     .RegisterType<ShapeRepository>()
-                    .As<ICalculatorRepository>()
+                    .As<IShapeRepository>()
                     .InstancePerLifetimeScope();
                 builder
-                    .RegisterType<CalculationService>()
-                    .As<ICalculatorService>()
+                    .RegisterType<ShapeService>()
+                    .As<IShapeService>()
                     .InstancePerLifetimeScope ();
 
                 // c) Console-apparna själva

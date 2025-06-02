@@ -77,6 +77,14 @@ public class MenuRunner
                 var calcRunner = _container.Resolve<Calculator.CalculatorRunner>();
                 calcRunner.Run();
             }
+            else if (appKey == "shape")
+            {
+                AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
+                MenuHelper.ShowLoading("Loading application...", loadingTime);
+
+                var shapeRunner = _container.Resolve<Shape.ShapeRunner>();
+                shapeRunner.Run();
+            }
             else if (appKey != null && _container.IsRegisteredWithName<IApp>(appKey))
             {
                 AnsiConsole.MarkupLine($"\n[bold green]Launching {selectedApp}...[/]");
