@@ -23,6 +23,25 @@ public class CalculatorRepository : ICalculatorRepository
             .ToListAsync(ct);
         return list;
     }
-
-
+    public async Task<CalculatorCalculation?> GetByIdAsync(int id, CancellationToken ct = default)
+    {
+        return await _db.Calculations
+                               .AsNoTracking()
+                               .FirstOrDefaultAsync(c => c.Id == id, ct);
+    }
+    public async Task<CalculatorCalculation> UpdateAsync(CalculatorCalculation entity, CancellationToken ct = default)
+    {
+        _db.Calculations.Update(entity);
+        await _db.SaveChangesAsync(ct);
+        return entity;
+    }
+    public async Task DeleteAsync(int id, CancellationToken ct = default)
+    {
+        var toDelete = await _db.Calculations.FindAsync(new object[] { id }, ct);
+        if (toDelete != null)
+        {
+            _db.Calculations.Remove(toDelete);
+            await _db.SaveChangesAsync(ct);
+        }
+    }
 }
