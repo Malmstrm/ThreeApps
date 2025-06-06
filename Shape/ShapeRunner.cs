@@ -40,6 +40,7 @@ public class ShapeRunner : IApp
                     break;
                 case "List All":
                     ShowAll();
+                    Console.ReadKey();
                     break;
                 case "Update":
                     UpdateCalculation();
@@ -126,17 +127,19 @@ public class ShapeRunner : IApp
     }
     private void UpdateCalculation()
     {
+        Console.Clear();
+        ShowAll();
+
         // 1) Läs in Id
         var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of record to update:");
         if (!int.TryParse(idText, out int id))
         {
             AnsiConsole.MarkupLine("[red]Invalid Id.[/]");
-            Console.ReadKey();
             return;
         }
 
         // 2) Hämta befintlig post
-        var existing = _service.GetByIdAsyc(id).Result;
+        var existing = _service.GetByIdAsyc(id).Result;  // Förutsätter att metoden heter GetByIdAsync
         if (existing is null)
         {
             AnsiConsole.MarkupLine("[red]No record found with that Id.[/]");
@@ -152,17 +155,15 @@ public class ShapeRunner : IApp
         {
             case ShapeType.Rectangle:
                 {
+                    // Rektangel: Width + Height
                     double oldW = existing.Parameters.First(p => p.ParameterType == ParameterType.Width).Value;
                     double oldH = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
 
+                    // Använd TextPrompt<string> med .AllowEmpty() för att ge förifylld inmatning
                     var wStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>(
-                            $"Enter [green]width[/] (default: {oldW}):"
-                        ).AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]width[/] (default: {oldW}):").AllowEmpty());
                     var hStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>(
-                            $"Enter [green]height[/] (default: {oldH}):"
-                        ).AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]height[/] (default: {oldH}):").AllowEmpty());
 
                     double w = string.IsNullOrWhiteSpace(wStr) ? oldW : double.Parse(wStr);
                     double h = string.IsNullOrWhiteSpace(hStr) ? oldH : double.Parse(hStr);
@@ -174,71 +175,76 @@ public class ShapeRunner : IApp
 
             case ShapeType.Parallelogram:
                 {
-                    double oldB = existing.Parameters.First(p => p.ParameterType == ParameterType.Base).Value;
-                    double oldS = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
+                    // Parallelogram: SideA + SideB + Height
+                    // (Tidigare Base + SideA + Height, men vi vill nu använda två sidor istället för Base och SideA)
+                    // Antag att din parallellogram‐kod räknar area = SideA × Height och peri = 2×(SideA + SideB).
+                    double oldSideA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
+                    double oldSideB = existing.Parameters.First(p => p.ParameterType == ParameterType.SideB).Value;
                     double oldH = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
 
+                    var aStr = AnsiConsole.Prompt(
+                        new TextPrompt<string>($"Enter [green]side A[/] (default: {oldSideA}):").AllowEmpty());
                     var bStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]base[/] (default: {oldB}):").AllowEmpty());
-                    var sStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side[/] (default: {oldS}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side B[/] (default: {oldSideB}):").AllowEmpty());
                     var hStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Enter [green]height[/] (default: {oldH}):").AllowEmpty());
 
-                    double b = string.IsNullOrWhiteSpace(bStr) ? oldB : double.Parse(bStr);
-                    double s = string.IsNullOrWhiteSpace(sStr) ? oldS : double.Parse(sStr);
+                    double sideA = string.IsNullOrWhiteSpace(aStr) ? oldSideA : double.Parse(aStr);
+                    double sideB = string.IsNullOrWhiteSpace(bStr) ? oldSideB : double.Parse(bStr);
                     double h = string.IsNullOrWhiteSpace(hStr) ? oldH : double.Parse(hStr);
 
-                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = b });
-                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = s });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideB, Value = sideB });
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = h });
                 }
                 break;
 
             case ShapeType.Triangle:
                 {
-                    double oldSideA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
-                    double oldBas = existing.Parameters.First(p => p.ParameterType == ParameterType.SideB).Value;
-                    double oldSideC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
-                    double oldHeight = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
+                    // Triangel: SideA + Base + SideC + Height
+                    double oldA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
+                    double oldB = existing.Parameters.First(p => p.ParameterType == ParameterType.Base).Value;
+                    double oldC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
+                    double oldH = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
 
                     var aStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side A[/] (default: {oldSideA}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side A[/] (default: {oldA}):").AllowEmpty());
                     var bStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side B[/] (default: {oldBas}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]base[/] (default: {oldB}):").AllowEmpty());
                     var cStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side C[/] (default: {oldSideC}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side C[/] (default: {oldC}):").AllowEmpty());
                     var hStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side C[/] (default: {oldHeight}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]height[/] (default: {oldH}):").AllowEmpty());
 
-                    double a = string.IsNullOrWhiteSpace(aStr) ? oldSideA : double.Parse(aStr);
-                    double b = string.IsNullOrWhiteSpace(bStr) ? oldBas : double.Parse(bStr);
-                    double c = string.IsNullOrWhiteSpace(cStr) ? oldSideC : double.Parse(cStr);
-                    double h = string.IsNullOrWhiteSpace(cStr) ? oldHeight : double.Parse(cStr);
+                    double sideA = string.IsNullOrWhiteSpace(aStr) ? oldA : double.Parse(aStr);
+                    double bas = string.IsNullOrWhiteSpace(bStr) ? oldB : double.Parse(bStr);
+                    double sideC = string.IsNullOrWhiteSpace(cStr) ? oldC : double.Parse(cStr);
+                    double height = string.IsNullOrWhiteSpace(hStr) ? oldH : double.Parse(hStr);
 
-                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = a });
-                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideB, Value = b });
-                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = c });
-                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = c });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = bas });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = sideC });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = height });
                 }
                 break;
 
             case ShapeType.Rhombus:
                 {
+                    // Rhombus: Diagonal1 + Diagonal2 + SideA
                     double oldD1 = existing.Parameters.First(p => p.ParameterType == ParameterType.Diagonal1).Value;
                     double oldD2 = existing.Parameters.First(p => p.ParameterType == ParameterType.Diagonal2).Value;
-                    double oldS = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
+                    double oldSide = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
 
                     var d1Str = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Enter [green]diagonal 1[/] (default: {oldD1}):").AllowEmpty());
                     var d2Str = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Enter [green]diagonal 2[/] (default: {oldD2}):").AllowEmpty());
                     var sStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side length[/] (default: {oldS}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side length[/] (default: {oldSide}):").AllowEmpty());
 
                     double d1 = string.IsNullOrWhiteSpace(d1Str) ? oldD1 : double.Parse(d1Str);
                     double d2 = string.IsNullOrWhiteSpace(d2Str) ? oldD2 : double.Parse(d2Str);
-                    double side = string.IsNullOrWhiteSpace(sStr) ? oldS : double.Parse(sStr);
+                    double side = string.IsNullOrWhiteSpace(sStr) ? oldSide : double.Parse(sStr);
 
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.Diagonal1, Value = d1 });
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.Diagonal2, Value = d2 });
@@ -247,6 +253,7 @@ public class ShapeRunner : IApp
                 break;
 
             default:
+                // Om vi av misstag kommer hit, går vi tillbaka till huvudmenyn
                 return;
         }
 
@@ -281,7 +288,6 @@ public class ShapeRunner : IApp
         }
 
         AnsiConsole.Write(table);
-        Console.ReadKey();
     }
     private void DeleteCalculation()
     {
