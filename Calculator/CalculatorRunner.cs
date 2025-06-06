@@ -24,18 +24,45 @@ public class CalculatorRunner
             Console.Clear();
             AnsiConsole.Write(new FigletText("Calculator").Centered());
 
+
             var choice = _nav.NavigateWithArrows(
                 "Choose an option:",
                 "New Calculation",
-                "History",
-                "Return to Main Menu");
+                "List All",
+                "Update Calculation",
+                "Delete Calculation",
+                "Return to Main Menu"
+            );
 
-            if (choice == "New Calculation")
-                PerformCalculation();
-            else if (choice == "History")
-                ShowHistory();
-            else
-                break;
+
+            if (choice == null || choice == "Return to Main Menu")
+            {
+                return;
+            }
+
+
+            switch (choice)
+            {
+                case "New Calculation":
+                    PerformCalculation();
+                    break;
+
+                case "List All":
+                    ShowHistory();
+                    break;
+
+                case "Update Calculation":
+                    UpdateCalculation();
+                    break;
+
+                case "Delete Calculation":
+                    DeleteCalculation();
+                    break;
+
+                default:
+
+                    return;
+            }
         }
     }
     private void PerformCalculation()
