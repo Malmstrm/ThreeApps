@@ -106,4 +106,82 @@ public class CalculatorRunner
         AnsiConsole.Write(table);
         Console.ReadKey();
     }
+    private void UpdateCalculation()
+    {
+        Console.Clear();
+        Console.WriteLine("Update Calculation");
+        Console.WriteLine("------------------");
+
+        var history = _calc.GetHistoryAsync().Result;
+        var table = new Table()
+            .AddColumns("Id", "Date", "A", "B", "Op", "Result");
+        foreach (var c in history)
+        {
+            table.AddRow(
+                c.Id.ToString(),
+                c.Date.ToString("yyyy-MM-dd"),
+                c.Operand1.ToString("F2"),
+                c.Operand2?.ToString("F2") ?? "-",
+                c.Operator.ToString(),
+                c.Result.ToString("F2")
+            );
+        }
+        AnsiConsole.Write(table);
+
+        Console.WriteLine();
+        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of record to update (or type 'cancel'):");
+        if (idText.Equals("cancel", StringComparison.OrdinalIgnoreCase))
+            return;
+        if (!int.TryParse(idText, out int id))
+        {
+            AnsiConsole.MarkupLine("[red]Invalid Id.[/]");
+            Console.ReadKey(true);
+            return;
+        }
+
+        var existing = _calc.GetByIdAsync(id).Result;
+        if (existing is null)
+        {
+            AnsiConsole.MarkupLine("[red]No record found with that Id.[/]");
+            Console.ReadKey(true);
+            return;
+        }
+
+        Console.WriteLine();
+        AnsiConsole.MarkupLine("Leave blank to keep existing value.");
+
+
+        var oldA = existing.Operand1;
+        var aStr = AnsiConsole.Prompt(
+            new TextPrompt<string>($"First number (current: {oldA:F2}):").AllowEmpty());
+        double newA = string.IsNullOrWhiteSpace(aStr) ? oldA : double.Parse(aStr);
+
+
+        var oldOp = existing.Operator;
+        var opChoice = _nav.NavigateWithArrows(
+            $"Operator (current: {oldOp}):",
+            Enum.GetNames(typeof(CalculatorOperator)));
+        var newOp = Enum.Parse<CalculatorOperator>(opChoice);
+
+
+        double? newB = null;
+        if (newOp != CalculatorOperator.SquareRoot)
+        {
+            var oldB = existing.Operand2 ?? 0;
+            var bPrompt = AnsiConsole.Prompt(
+                new TextPrompt<string>($"Second number (current: {oldB:F2}):").AllowEmpty());
+
+            newB = string.IsNullOrWhiteSpace(bPrompt)
+                ? existing.Operand2
+                : double.Parse(bPrompt);
+        }
+
+
+        var cmd = new UpdateCalculationCommand(id, newA, newB, newOp);
+        var updated = _calc.UpdateAsync(cmd).Result;
+
+        AnsiConsole.MarkupLine($"\n[green]Record updated! New result: {updated.Result:F2}[/]");
+        Console.WriteLine("Press any key to return...");
+        Console.ReadKey(true);
+    }
 }
