@@ -60,8 +60,9 @@ public class ShapeService : IShapeService
 
             case ShapeType.Triangle:
                 ValidatePresence(ParameterType.SideA);
-                ValidatePresence(ParameterType.SideB);
+                ValidatePresence(ParameterType.Base);
                 ValidatePresence(ParameterType.SideC);
+                ValidatePresence(ParameterType.Height);
                 break;
 
             case ShapeType.Rhombus:
@@ -95,13 +96,15 @@ public class ShapeService : IShapeService
 
             case ShapeType.Triangle:
                 {
-                    double a = paramDict[ParameterType.SideA];
-                    double b = paramDict[ParameterType.SideB];
-                    double c = paramDict[ParameterType.SideC];
-                    double s = (a + b + c) / 2.0;
-                    double areaTri = Math.Sqrt(s * (s - a) * (s - b) * (s - c));
-                    area = areaTri;
-                    peri = a + b + c;
+                    double sideA = paramDict[ParameterType.SideA];
+                    double bas = paramDict[ParameterType.Base];
+                    double sideC = paramDict[ParameterType.SideC];
+                    double height = paramDict[ParameterType.Height];
+                    // Omkrets = alla tre sidor
+                    peri = sideA + bas + sideC;
+
+                    // Area = bas × höjd / 2
+                    area = (bas * height) / 2.0;
                 }
                 break;
 
