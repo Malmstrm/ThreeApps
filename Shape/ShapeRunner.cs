@@ -278,9 +278,13 @@ public class ShapeRunner : IApp
 
     private void ShowAll()
     {
+        Console.Clear();
+        AnsiConsole.Write(new Rule("[yellow]All Calculations[/]").Centered());
+
         var list = _service.GetAllAsync().Result;
 
         var table = new Table()
+            .BorderColor(Color.Grey37)
             .AddColumns("Id", "Date", "Shape", "Area", "Perimeter", "Parameters");
 
         foreach (var s in list)
@@ -290,7 +294,7 @@ public class ShapeRunner : IApp
 
             table.AddRow(
                 s.Id.ToString(),
-                s.Date.ToString("d"),
+                s.Date.ToString("yyyy-MM-dd"),
                 s.ShapeType.ToString(),
                 s.Area.ToString("F2"),
                 s.Perimeter.ToString("F2"),
