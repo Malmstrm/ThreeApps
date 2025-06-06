@@ -214,24 +214,24 @@ public class ShapeRunner : IApp
             case ShapeType.Triangle:
                 {
                     AnsiConsole.MarkupLine("Triangle – enter new values or press Enter to keep defaults:");
-                    double oldA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
-                    double oldB = existing.Parameters.First(p => p.ParameterType == ParameterType.Base).Value;
-                    double oldC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
-                    double oldH = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
+                    double oldSideA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
+                    double oldBas = existing.Parameters.First(p => p.ParameterType == ParameterType.Base).Value;
+                    double oldSideC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
+                    double oldHeight = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
 
                     var aStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Side A (default: {oldA}):").AllowEmpty());
+                        new TextPrompt<string>($"Side A (default: {oldSideA}):").AllowEmpty());
                     var bStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Base   (default: {oldB}):").AllowEmpty());
+                        new TextPrompt<string>($"Base   (default: {oldBas}):").AllowEmpty());
                     var cStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Side C (default: {oldC}):").AllowEmpty());
+                        new TextPrompt<string>($"Side C (default: {oldSideC}):").AllowEmpty());
                     var hStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Height (default: {oldH}):").AllowEmpty());
+                        new TextPrompt<string>($"Height (default: {oldHeight}):").AllowEmpty());
 
-                    double sideA = string.IsNullOrWhiteSpace(aStr) ? oldA : double.Parse(aStr);
-                    double bas = string.IsNullOrWhiteSpace(bStr) ? oldB : double.Parse(bStr);
-                    double sideC = string.IsNullOrWhiteSpace(cStr) ? oldC : double.Parse(cStr);
-                    double height = string.IsNullOrWhiteSpace(hStr) ? oldH : double.Parse(hStr);
+                    double sideA = string.IsNullOrWhiteSpace(aStr) ? oldSideA : double.Parse(aStr);
+                    double bas = string.IsNullOrWhiteSpace(bStr) ? oldBas : double.Parse(bStr);
+                    double sideC = string.IsNullOrWhiteSpace(cStr) ? oldSideC : double.Parse(cStr);
+                    double height = string.IsNullOrWhiteSpace(hStr) ? oldHeight : double.Parse(hStr);
 
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = bas });
