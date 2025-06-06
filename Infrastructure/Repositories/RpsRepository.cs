@@ -29,5 +29,12 @@ namespace Infrastructure.Repositories
 
             return list;
         }
+        public async Task<RPSGame?> GetLatestAsync(CancellationToken ct = default)
+        {
+            return await _dbContext.RPSGames
+                .AsNoTracking()
+                .OrderByDescending(g => g.Id)
+                .FirstOrDefaultAsync(ct);
+        }
     }
 }
