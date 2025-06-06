@@ -87,12 +87,14 @@ public class ShapeRunner : IApp
 
             case ShapeType.Triangle:
                 {
-                    double a = double.Parse(AnsiConsole.Ask<string>("Enter [green]side A[/]:"));
-                    double b = double.Parse(AnsiConsole.Ask<string>("Enter [green]side B[/]:"));
-                    double c = double.Parse(AnsiConsole.Ask<string>("Enter [green]side C[/]:"));
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = a });
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideB, Value = b });
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = c });
+                    double sideA = double.Parse(AnsiConsole.Ask<string>("Enter [green]side A[/]:"));
+                    double bas = double.Parse(AnsiConsole.Ask<string>("Enter [green]base[/]:"));
+                    double sideC = double.Parse(AnsiConsole.Ask<string>("Enter [green]side C[/]:"));
+                    double height = double.Parse(AnsiConsole.Ask<string>("Enter [green]height[/]:"));
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = bas });
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = sideC });
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = height });
                 }
                 break;
 
