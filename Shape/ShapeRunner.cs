@@ -62,75 +62,81 @@ public class ShapeRunner : IApp
         Console.Clear();
         AnsiConsole.Write(new Rule("[yellow]New Calculation[/]").Centered());
 
-        var shapeStr = _nav.NavigateWithArrows(
+        // 1) Välj form (Esc avbryter och returnerar null)
+        var choice = _nav.NavigateWithArrows(
             "Select shape:",
             Enum.GetNames(typeof(ShapeType)));
-        var shapeType = Enum.Parse<ShapeType>(shapeStr);
+        if (choice == null)
+        {
+            // Användaren tryckte Esc – gå tillbaka till menyn
+            return;
+        }
 
-        var paramList = new List<ParameterDTO>();
+        var shapeType = Enum.Parse<ShapeType>(choice);
 
-        AnsiConsole.Clear();
-
+        // Visa vilken form som valdes
         AnsiConsole.MarkupLine($"\nYou selected: [cyan]{shapeType}[/]\n");
 
-        switch (shapeType)
+        // 2) Läs in parametrar… (samma som tidigare)
+        var paramList = new List<ParameterDTO>();
+        try
         {
-            case ShapeType.Rectangle:
-                {
-                    AnsiConsole.MarkupLine("Enter [green]width[/] and [green]height[/]:");
+            switch (shapeType)
+            {
+                case ShapeType.Rectangle:
+                    AnsiConsole.MarkupLine("Enter [green]width[/] and [green]height[/] (or type 'cancel'):");
                     double w = ReadDouble("Width:");
                     double h = ReadDouble("Height:");
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Width, Value = w });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = h });
-                }
-                break;
+                    break;
 
-            case ShapeType.Parallelogram:
-                {
-                    AnsiConsole.MarkupLine("Enter [green]side A[/], [green]side B[/] and [green]height[/]:");
+                case ShapeType.Parallelogram:
+                    AnsiConsole.MarkupLine("Enter [green]side A[/], [green]side B[/] and [green]height[/] (or type 'cancel'):");
                     double sideA = ReadDouble("Side A:");
                     double sideB = ReadDouble("Side B:");
-                    double h = ReadDouble("Height:");
+                    double ph = ReadDouble("Height:");
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideB, Value = sideB });
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = h });
-                }
-                break;
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = ph });
+                    break;
 
-            case ShapeType.Triangle:
-                {
-                    AnsiConsole.MarkupLine("Enter [green]side A[/], [green]base[/], [green]side C[/] and [green]height[/]:");
-                    double sideA = ReadDouble("Side A:");
+                case ShapeType.Triangle:
+                    AnsiConsole.MarkupLine("Enter [green]side A[/], [green]base[/], [green]side C[/] and [green]height[/] (or type 'cancel'):");
+                    double sideA2 = ReadDouble("Side A:");
                     double bas = ReadDouble("Base:");
                     double sideC = ReadDouble("Side C:");
                     double height = ReadDouble("Height:");
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA2 });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = bas });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = sideC });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = height });
-                }
-                break;
+                    break;
 
-            case ShapeType.Rhombus:
-                {
-                    AnsiConsole.MarkupLine("Enter [green]diagonal 1[/], [green]diagonal 2[/] and [green]side length[/]:");
+                case ShapeType.Rhombus:
+                    AnsiConsole.MarkupLine("Enter [green]diagonal 1[/], [green]diagonal 2[/] and [green]side length[/] (or type 'cancel'):");
                     double d1 = ReadDouble("Diagonal 1:");
                     double d2 = ReadDouble("Diagonal 2:");
                     double side = ReadDouble("Side length:");
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Diagonal1, Value = d1 });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Diagonal2, Value = d2 });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = side });
-                }
-                break;
+                    break;
 
-            default:
-                return;
+                default:
+                    return;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Användaren skrev "cancel" i ReadDouble → gå tillbaka till menyn
+            return;
         }
 
+        // 3) Skicka till service och visa resultat…
         var cmd = new CreateShapeCommand(shapeType, paramList);
         var dto = _service.CreateAsync(cmd).Result;
 
-        // 4) Show the result
         AnsiConsole.MarkupLine("\n[bold green]Result:[/]");
         AnsiConsole.MarkupLine($"Shape: [cyan]{dto.ShapeType}[/]");
         AnsiConsole.MarkupLine($"Area: [yellow]{dto.Area:F2}[/]");
@@ -351,11 +357,20 @@ public class ShapeRunner : IApp
     {
         while (true)
         {
-            var input = AnsiConsole.Ask<string>($"{prompt}");
-            if (double.TryParse(input, out var val))
-                return val;
+            var input = AnsiConsole.Ask<string>($"{prompt} (or type 'cancel' to go back):");
 
-            AnsiConsole.MarkupLine("[red]Invalid number – please try again.[/]");
+            if (string.Equals(input?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase))
+            {
+                // Avbryt hela flödet
+                throw new OperationCanceledException();
+            }
+
+            if (double.TryParse(input, out var val))
+            {
+                return val;
+            }
+
+            AnsiConsole.MarkupLine("[red]Invalid number – please try again (or type 'cancel').[/]");
         }
     }
 }
