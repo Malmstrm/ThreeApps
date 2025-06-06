@@ -28,11 +28,11 @@ public class ShapeRunner : IApp
                 .Color(Color.Cyan1));
 
             var choice = _nav.NavigateWithArrows(
-                "Choose an option:",
+                "Choose an action:",
                 "New Calculation",
                 "List All",
-                "Update Calculation",
-                "Delete Calculation",
+                "Update",
+                "Delete",
                 "Return to Main Menu");
 
             switch (choice)
