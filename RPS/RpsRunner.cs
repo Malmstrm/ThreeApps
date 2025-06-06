@@ -49,23 +49,52 @@ namespace RPS
 
         private void PlayRound()
         {
-            // 1) Låt användaren välja drag
+            Console.Clear();
+            ShowHeader();
+
+
             var moveStr = _navigation.NavigateWithArrows(
-                "Your move:", "Rock", "Paper", "Scissors");
-            var cmd = new PlayRpsCommand(Enum.Parse<RPSMove>(moveStr));
+                "Your move (press Esc to cancel):",
+                "Rock",
+                "Paper",
+                "Scissors");
 
-            // 2) Spela via IRpsService
-            var result = _service.PlayAsync(cmd).Result;
+            if (moveStr == null)
+            {
 
-            // 3) Visa utfall och procent
-            AnsiConsole.MarkupLine($"\nYou: [yellow]{result.PlayerMove}[/]" +
-                                   $"  CPU: [yellow]{result.ComputerMove}[/]" +
-                                   $"  → [bold cyan]{result.Outcome}![/]");
+                return;
+            }
 
-            var winRate = _service.GetWinRateAsync().Result;
-            AnsiConsole.MarkupLine($"[grey]Win-rate overall: {winRate:P1}[/]");
+            var playerMove = Enum.Parse<RPSMove>(moveStr);
+            AnsiConsole.MarkupLine($"\nYou chose: [yellow]{playerMove}[/]");
 
-            Console.ReadKey();
+
+            AnsiConsole.Status().Start("CPU is thinking...", ctx => Thread.Sleep(700));
+
+
+            var played = _service.PlayAsync(new PlayRpsCommand(playerMove)).Result;
+
+
+            AnsiConsole.MarkupLine($"\nYou: [yellow]{played.PlayerMove}[/]" +
+                                   $"  CPU: [yellow]{played.ComputerMove}[/]" +
+                                   $"  → [bold cyan]{played.Outcome}![/]");
+
+
+            Console.WriteLine();
+            AnsiConsole.MarkupLine("Play again? [green]Y[/] or [red]N[/] (or press Esc to return)");
+            while (true)
+            {
+                var key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Y)
+                {
+                    PlayRound();
+                    return;
+                }
+                else if (key == ConsoleKey.N || key == ConsoleKey.Escape)
+                {
+                    return;
+                }
+            }
         }
 
         private void ShowHistory()
