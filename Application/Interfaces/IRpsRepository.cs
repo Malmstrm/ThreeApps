@@ -9,6 +9,6 @@ namespace Application.Interfaces
         Task<IReadOnlyList<RPSGame>> GetAllAsync(CancellationToken ct = default);
         Task<int> CountAsync(Expression<Func<RPSGame, bool>> predicate, CancellationToken ct = default);
 
-        Task<RPSGame?> GetLastestAsync(CancellationToken ct = default);
+        Task<RPSGame?> GetLatestAsync(CancellationToken ct = default);
     }
 }

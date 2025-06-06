@@ -23,7 +23,7 @@ public class RpsService : IRpsService
         var outcome = Evaluate(cmd.PlayerMove, cpuMove);
 
 
-        var last = await _repo.GetLastestAsync(ct);
+        var last = await _repo.GetLatestAsync(ct);
 
 
         int prevGames = last?.Games ?? 0;
@@ -61,7 +61,7 @@ public class RpsService : IRpsService
 
     public async Task<double> GetWinRateAsync(CancellationToken ct = default)
     {
-        var last = await _repo.GetLastestAsync(ct);
+        var last = await _repo.GetLatestAsync(ct);
         if (last == null || last.Games == 0)
             return 0.0;
         return last.Wins / (double)last.Games;

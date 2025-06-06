@@ -70,43 +70,53 @@ namespace RPS
 
         private void ShowHistory()
         {
-            // 1) Hämta och sortera historiken kronologiskt
+            Console.Clear();
+            ShowHeader();
+
+            AnsiConsole.MarkupLine("\nPress [yellow]Esc[/] to cancel, or any other key to view history...");
+            var key = Console.ReadKey(true).Key;
+            if (key == ConsoleKey.Escape)
+                return;
+
             var history = _service.GetHistoryAsync().Result
-                                  .OrderBy(g => g.PlayedAt)
+                                  .OrderByDescending(g => g.PlayedAt)
                                   .ToList();
 
-            // 2) Lägg till en extra kolumn "Games" före win%-kolumnen
+            if (!history.Any())
+            {
+                AnsiConsole.MarkupLine("\n[grey]No games played yet.[/]");
+                AnsiConsole.MarkupLine("\nPress [green]any key[/] to return...");
+                Console.ReadKey(true);
+                return;
+            }
+
             var table = new Table()
-                .AddColumns("Date", "You", "CPU", "Result", "Games", "Win %");
+                .AddColumns("Date", "You", "CPU", "Result", "Games", "Wins", "Losses", "Ties", "Win %");
 
-            int total = 0;
-            int wins = 0;
-
-            // 3) Fyll på rad-för-rad
             foreach (var g in history)
             {
-                total++;
-                if (g.Outcome == GameOutcome.Win)
-                    wins++;
-
-                double rate = (double)wins / total;
+                double winRate = 0;
+                if (g.Games > 0)
+                    winRate = g.Wins / (double)g.Games;
 
                 table.AddRow(
-                    g.PlayedAt.ToString("d"),
+                    g.PlayedAt.ToString("yyyy-MM-dd"),
                     g.PlayerMove.ToString(),
                     g.ComputerMove.ToString(),
                     g.Outcome.ToString(),
-                    total.ToString(),         // <-- Antal spel hittills
-                    rate.ToString("P1")       // <-- Kumulativ win%
+                    g.Games.ToString(),
+                    g.Wins.ToString(),
+                    g.Losses.ToString(),
+                    g.Ties.ToString(),
+                    winRate.ToString("P1")
                 );
             }
 
-            // 4) Rendera tabellen
             AnsiConsole.Write(table);
-            Console.ReadKey();
+            Console.WriteLine();
+            AnsiConsole.MarkupLine("Press [green]any key[/] to return...");
+            Console.ReadKey(true);
         }
-
-
 
         private static void ShowHeader() =>
             AnsiConsole.Write(
