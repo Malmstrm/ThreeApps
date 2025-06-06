@@ -184,4 +184,59 @@ public class CalculatorRunner
         Console.WriteLine("Press any key to return...");
         Console.ReadKey(true);
     }
+
+    private void DeleteCalculation()
+    {
+        Console.Clear();
+        Console.WriteLine("Delete Calculation");
+        Console.WriteLine("------------------");
+
+        var history = _calc.GetHistoryAsync().Result;
+        var table = new Table()
+            .AddColumns("Id", "Date", "A", "B", "Op", "Result");
+        foreach (var c in history)
+        {
+            table.AddRow(
+                c.Id.ToString(),
+                c.Date.ToString("yyyy-MM-dd"),
+                c.Operand1.ToString("F2"),
+                c.Operand2?.ToString("F2") ?? "-",
+                c.Operator.ToString(),
+                c.Result.ToString("F2")
+            );
+        }
+        AnsiConsole.Write(table);
+
+        Console.WriteLine();
+        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of record to delete (or type 'cancel'):");
+        if (idText.Equals("cancel", StringComparison.OrdinalIgnoreCase))
+            return;
+        if (!int.TryParse(idText, out int id))
+        {
+            AnsiConsole.MarkupLine("[red]Invalid Id.[/]");
+            Console.ReadKey(true);
+            return;
+        }
+
+        var existing = _calc.GetByIdAsync(id).Result;
+        if (existing is null)
+        {
+            AnsiConsole.MarkupLine("[red]No record found with that Id.[/]");
+            Console.ReadKey(true);
+            return;
+        }
+
+        bool confirm = AnsiConsole.Confirm($"Are you sure you want to delete Id {id} (result={existing.Result:F2})?");
+        if (!confirm)
+        {
+            AnsiConsole.MarkupLine("Deletion canceled. Press any key to return...");
+            Console.ReadKey(true);
+            return;
+        }
+
+        _calc.DeleteAsync(id).Wait();
+        AnsiConsole.MarkupLine("\n[red]Record deleted![/]");
+        Console.WriteLine("Press any key to continue...");
+        Console.ReadKey(true);
+    }
 }
