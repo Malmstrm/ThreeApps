@@ -239,4 +239,21 @@ public class CalculatorRunner
         Console.WriteLine("Press any key to continue...");
         Console.ReadKey(true);
     }
+    private bool TryReadDouble(string prompt, out double value)
+    {
+        while (true)
+        {
+            var input = AnsiConsole.Prompt(new TextPrompt<string>($"{prompt} (or type 'cancel'): "));
+            if (string.Equals(input, "cancel", StringComparison.OrdinalIgnoreCase))
+            {
+                value = 0;
+                return false; 
+            }
+            if (double.TryParse(input, out value))
+            {
+                return true;
+            }
+            AnsiConsole.MarkupLine("[red]Invalid number – please try again or type 'cancel' to abort.[/]");
+        }
+    }
 }
