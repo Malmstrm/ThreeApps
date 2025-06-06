@@ -34,14 +34,18 @@ namespace RPS
                     "History",
                     "Return to Main Menu");
 
+                if (choice == null || choice == "Return to Main Menu")
+                {
+                    break;
+                }
+
                 if (choice == "Play")
                     PlayRound();
                 else if (choice == "History")
                     ShowHistory();
-                else
-                    break;
             }
         }
+
 
         private void PlayRound()
         {
