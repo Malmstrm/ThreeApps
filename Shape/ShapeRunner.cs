@@ -306,6 +306,17 @@ public class ShapeRunner : IApp
         AnsiConsole.MarkupLine("[yellow]Record deleted![/]");
         Console.ReadKey();
     }
+    private double ReadDouble(string prompt)
+    {
+        while (true)
+        {
+            var input = AnsiConsole.Ask<string>($"{prompt}");
+            if (double.TryParse(input, out var val))
+                return val;
+
+            AnsiConsole.MarkupLine("[red]Invalid number – please try again.[/]");
+        }
+    }
 }
 
 
