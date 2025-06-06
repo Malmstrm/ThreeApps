@@ -7,7 +7,7 @@ namespace Shared.Services;
 
 public class NavigationService : INavigationService
 {
-    public string NavigateWithArrows(string title, params string[] options)
+    public string? NavigateWithArrows(string title, params string[] options)
     {
         int index = 0;
         ConsoleKey key;
@@ -28,9 +28,17 @@ public class NavigationService : INavigationService
             key = Console.ReadKey(true).Key;
 
             if (key == ConsoleKey.UpArrow)
+            {
                 index = (index == 0) ? options.Length - 1 : index - 1;
+            }
             else if (key == ConsoleKey.DownArrow)
+            {
                 index = (index + 1) % options.Length;
+            }
+            else if (key == ConsoleKey.Escape)
+            {
+                return null;
+            }
 
         } while (key != ConsoleKey.Enter);
 

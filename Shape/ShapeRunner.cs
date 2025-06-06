@@ -69,6 +69,10 @@ public class ShapeRunner : IApp
 
         var paramList = new List<ParameterDTO>();
 
+        AnsiConsole.Clear();
+
+        AnsiConsole.MarkupLine($"\nYou selected: [cyan]{shapeType}[/]\n");
+
         switch (shapeType)
         {
             case ShapeType.Rectangle:
