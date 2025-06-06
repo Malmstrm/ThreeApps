@@ -96,6 +96,7 @@ class Program
         {
             var db = migScope.ServiceProvider.GetRequiredService<AppDbContext>();
             db.Database.Migrate();
+            DataInitializer.Seed(db);
         }
 
         // Skapa scope och kör huvudmenyn
