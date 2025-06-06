@@ -8,5 +8,10 @@ namespace Domain.Entities
         public RPSMove PlayerMove { get; set; }
         public RPSMove ComputerMove { get; set; }
         public GameOutcome Outcome { get; set; }
+
+        public int Games { get; set; }
+        public int Wins { get; set; }
+        public int Losses { get; set; }
+        public int Ties { get; set; }
     }
 }
