@@ -23,10 +23,12 @@ public class ShapeRunner : IApp
         while (true)
         {
             Console.Clear();
-            AnsiConsole.Write(new FigletText("Shape Calculator").Centered());
+            AnsiConsole.Write(new FigletText("Shape Calculator")
+                .Centered()
+                .Color(Color.Cyan1));
 
             var choice = _nav.NavigateWithArrows(
-                "Choose an option:",
+                "Choose an action:",
                 "New Calculation",
                 "List All",
                 "Update",
@@ -40,7 +42,8 @@ public class ShapeRunner : IApp
                     break;
                 case "List All":
                     ShowAll();
-                    Console.ReadKey();
+                    AnsiConsole.MarkupLine("\nPress [green]any key[/] to continue...");
+                    Console.ReadKey(true);
                     break;
                 case "Update":
                     UpdateCalculation();
@@ -50,7 +53,7 @@ public class ShapeRunner : IApp
                     break;
                 default:
                     return;
-            };
+            }
         }
     }
 
