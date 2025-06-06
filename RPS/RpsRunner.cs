@@ -102,9 +102,10 @@ namespace RPS
             Console.Clear();
             ShowHeader();
 
-            AnsiConsole.MarkupLine("\nPress [yellow]Esc[/] to cancel, or any other key to view history...");
-            var key = Console.ReadKey(true).Key;
-            if (key == ConsoleKey.Escape)
+            Console.WriteLine();
+            Console.WriteLine("Press [Esc] to cancel, or any other key to view history...");
+            var initialKey = Console.ReadKey(true).Key;
+            if (initialKey == ConsoleKey.Escape)
                 return;
 
             var history = _service.GetHistoryAsync().Result
@@ -113,38 +114,67 @@ namespace RPS
 
             if (!history.Any())
             {
-                AnsiConsole.MarkupLine("\n[grey]No games played yet.[/]");
-                AnsiConsole.MarkupLine("\nPress [green]any key[/] to return...");
+                Console.WriteLine();
+                Console.WriteLine("No games played yet.");
+                Console.WriteLine();
+                Console.WriteLine("Press any key to return...");
                 Console.ReadKey(true);
                 return;
             }
 
-            var table = new Table()
-                .AddColumns("Date", "You", "CPU", "Result", "Games", "Wins", "Losses", "Ties", "Win %");
+            const int pageSize = 10;
+            int totalItems = history.Count;
+            int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            int currentPage = 0;
 
-            foreach (var g in history)
+            while (true)
             {
-                double winRate = 0;
-                if (g.Games > 0)
-                    winRate = g.Wins / (double)g.Games;
+                Console.Clear();
+                ShowHeader();
 
-                table.AddRow(
-                    g.PlayedAt.ToString("yyyy-MM-dd"),
-                    g.PlayerMove.ToString(),
-                    g.ComputerMove.ToString(),
-                    g.Outcome.ToString(),
-                    g.Games.ToString(),
-                    g.Wins.ToString(),
-                    g.Losses.ToString(),
-                    g.Ties.ToString(),
-                    winRate.ToString("P1")
-                );
+                Console.WriteLine();
+                Console.WriteLine($"Page {currentPage + 1} of {totalPages}");
+                Console.WriteLine();
+
+                var table = new Table()
+                    .AddColumns("Date", "You", "CPU", "Result", "Games", "Wins", "Losses", "Ties", "Win %");
+
+                var pageItems = history
+                    .Skip(currentPage * pageSize)
+                    .Take(pageSize);
+
+                foreach (var g in pageItems)
+                {
+                    double winRate = 0;
+                    if (g.Games > 0)
+                        winRate = g.Wins / (double)g.Games;
+
+                    table.AddRow(
+                        g.PlayedAt.ToString("yyyy-MM-dd"),
+                        g.PlayerMove.ToString(),
+                        g.ComputerMove.ToString(),
+                        g.Outcome.ToString(),
+                        g.Games.ToString(),
+                        g.Wins.ToString(),
+                        g.Losses.ToString(),
+                        g.Ties.ToString(),
+                        winRate.ToString("P1")
+                    );
+                }
+
+                AnsiConsole.Write(table);
+
+                Console.WriteLine();
+                Console.WriteLine("Left arrow, Previous page   Right arrow, Next page   Esc Return");
+
+                var key = Console.ReadKey(true).Key;
+                if (key == ConsoleKey.Escape)
+                    return;
+                else if (key == ConsoleKey.RightArrow && currentPage < totalPages - 1)
+                    currentPage++;
+                else if (key == ConsoleKey.LeftArrow && currentPage > 0)
+                    currentPage--;
             }
-
-            AnsiConsole.Write(table);
-            Console.WriteLine();
-            AnsiConsole.MarkupLine("Press [green]any key[/] to return...");
-            Console.ReadKey(true);
         }
 
         private static void ShowHeader() =>
