@@ -306,17 +306,42 @@ public class ShapeRunner : IApp
     }
     private void DeleteCalculation()
     {
-        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of record to delete:");
+        Console.Clear();
+        AnsiConsole.Write(new Rule("[yellow]Delete Calculation[/]").Centered());
+        ShowAll();
+        Console.WriteLine();
+
+        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of the record to delete:");
         if (!int.TryParse(idText, out int id))
         {
             AnsiConsole.MarkupLine("[red]Invalid Id.[/]");
-            Console.ReadKey();
+            AnsiConsole.MarkupLine("Press [green]any key[/] to return...");
+            Console.ReadKey(true);
+            return;
+        }
+
+        var existing = _service.GetByIdAsyc(id).Result;
+        if (existing is null)
+        {
+            AnsiConsole.MarkupLine("[red]No record found with that Id.[/]");
+            AnsiConsole.MarkupLine("Press [green]any key[/] to return...");
+            Console.ReadKey(true);
+            return;
+        }
+
+        // Confirmation before deletion
+        bool confirm = AnsiConsole.Confirm($"Are you sure you want to delete the calculation with Id {id}?");
+        if (!confirm)
+        {
+            AnsiConsole.MarkupLine("Deletion canceled. Press [green]any key[/] to return...");
+            Console.ReadKey(true);
             return;
         }
 
         _service.DeleteAsync(id).Wait();
-        AnsiConsole.MarkupLine("[yellow]Record deleted![/]");
-        Console.ReadKey();
+        AnsiConsole.MarkupLine("\n[red]Record deleted![/]");
+        AnsiConsole.MarkupLine("Press [green]any key[/] to continue...");
+        Console.ReadKey(true);
     }
     private double ReadDouble(string prompt)
     {
