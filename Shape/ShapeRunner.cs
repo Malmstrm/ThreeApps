@@ -59,20 +59,23 @@ public class ShapeRunner : IApp
 
     private void PerformCalculation()
     {
-        // 1) Välj form
+        Console.Clear();
+        AnsiConsole.Write(new Rule("[yellow]New Calculation[/]").Centered());
+
         var shapeStr = _nav.NavigateWithArrows(
             "Select shape:",
             Enum.GetNames(typeof(ShapeType)));
         var shapeType = Enum.Parse<ShapeType>(shapeStr);
 
-        // 2) Läs in parametrar beroende på vald form
         var paramList = new List<ParameterDTO>();
+
         switch (shapeType)
         {
             case ShapeType.Rectangle:
                 {
-                    double w = double.Parse(AnsiConsole.Ask<string>("Enter [green]width[/]:"));
-                    double h = double.Parse(AnsiConsole.Ask<string>("Enter [green]height[/]:"));
+                    AnsiConsole.MarkupLine("Enter [green]width[/] and [green]height[/]:");
+                    double w = ReadDouble("Width:");
+                    double h = ReadDouble("Height:");
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Width, Value = w });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = h });
                 }
@@ -80,21 +83,23 @@ public class ShapeRunner : IApp
 
             case ShapeType.Parallelogram:
                 {
-                    double b = double.Parse(AnsiConsole.Ask<string>("Enter [green]base[/]:"));
-                    double s = double.Parse(AnsiConsole.Ask<string>("Enter [green]side[/]:"));
-                    double h = double.Parse(AnsiConsole.Ask<string>("Enter [green]height[/]:"));
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = b });
-                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = s });
+                    AnsiConsole.MarkupLine("Enter [green]side A[/], [green]side B[/] and [green]height[/]:");
+                    double sideA = ReadDouble("Side A:");
+                    double sideB = ReadDouble("Side B:");
+                    double h = ReadDouble("Height:");
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
+                    paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideB, Value = sideB });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Height, Value = h });
                 }
                 break;
 
             case ShapeType.Triangle:
                 {
-                    double sideA = double.Parse(AnsiConsole.Ask<string>("Enter [green]side A[/]:"));
-                    double bas = double.Parse(AnsiConsole.Ask<string>("Enter [green]base[/]:"));
-                    double sideC = double.Parse(AnsiConsole.Ask<string>("Enter [green]side C[/]:"));
-                    double height = double.Parse(AnsiConsole.Ask<string>("Enter [green]height[/]:"));
+                    AnsiConsole.MarkupLine("Enter [green]side A[/], [green]base[/], [green]side C[/] and [green]height[/]:");
+                    double sideA = ReadDouble("Side A:");
+                    double bas = ReadDouble("Base:");
+                    double sideC = ReadDouble("Side C:");
+                    double height = ReadDouble("Height:");
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = sideA });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Base, Value = bas });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = sideC });
@@ -104,9 +109,10 @@ public class ShapeRunner : IApp
 
             case ShapeType.Rhombus:
                 {
-                    double d1 = double.Parse(AnsiConsole.Ask<string>("Enter [green]diagonal 1[/]:"));
-                    double d2 = double.Parse(AnsiConsole.Ask<string>("Enter [green]diagonal 2[/]:"));
-                    double side = double.Parse(AnsiConsole.Ask<string>("Enter [green]side length[/]:"));
+                    AnsiConsole.MarkupLine("Enter [green]diagonal 1[/], [green]diagonal 2[/] and [green]side length[/]:");
+                    double d1 = ReadDouble("Diagonal 1:");
+                    double d2 = ReadDouble("Diagonal 2:");
+                    double side = ReadDouble("Side length:");
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Diagonal1, Value = d1 });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.Diagonal2, Value = d2 });
                     paramList.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = side });
@@ -117,17 +123,19 @@ public class ShapeRunner : IApp
                 return;
         }
 
-        // 3) Bygg CreateShapeCommand och anropa service
         var cmd = new CreateShapeCommand(shapeType, paramList);
         var dto = _service.CreateAsync(cmd).Result;
 
-        // 4) Visa resultatet
-        AnsiConsole.MarkupLine(
-            $"\n[bold green]Shape:[/] {dto.ShapeType}  " +
-            $"[bold yellow]Area:[/] {dto.Area}  " +
-            $"[bold yellow]Perimeter:[/] {dto.Perimeter}");
-        Console.ReadKey();
+        // 4) Show the result
+        AnsiConsole.MarkupLine("\n[bold green]Result:[/]");
+        AnsiConsole.MarkupLine($"Shape: [cyan]{dto.ShapeType}[/]");
+        AnsiConsole.MarkupLine($"Area: [yellow]{dto.Area:F2}[/]");
+        AnsiConsole.MarkupLine($"Perimeter: [yellow]{dto.Perimeter:F2}[/]");
+
+        AnsiConsole.MarkupLine("\nPress [green]any key[/] to continue...");
+        Console.ReadKey(true);
     }
+
     private void UpdateCalculation()
     {
         Console.Clear();
