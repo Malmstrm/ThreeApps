@@ -43,7 +43,7 @@ public class MenuRunner
                 "Exit - Exit"
             );
 
-            if (selectedApp.Contains("Exit"))
+            if (selectedApp == null || selectedApp.Contains("Exit"))
             {
                 AnsiConsole.MarkupLine("\n[green]Exiting application. Goodbye![/]");
                 AnsiConsole.Write(new Rule("[yellow]Thank you for using ThreeApps![/]").Centered());
