@@ -340,7 +340,11 @@ public class ShapeRunner : IApp
         ShowAll();
         Console.WriteLine();
 
-        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of the record to delete:");
+
+        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of the record to delete (or type 'cancel' to return):");
+        if (string.Equals(idText?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase))
+            return;
+
         if (!int.TryParse(idText, out int id))
         {
             AnsiConsole.MarkupLine("[red]Invalid Id.[/]");
@@ -358,8 +362,7 @@ public class ShapeRunner : IApp
             return;
         }
 
-        // Confirmation before deletion
-        bool confirm = AnsiConsole.Confirm($"Are you sure you want to delete the calculation with Id {id}?");
+        bool confirm = AnsiConsole.Confirm($"Are you sure you want to delete the calculation with Id {id}? (Y/N)");
         if (!confirm)
         {
             AnsiConsole.MarkupLine("Deletion canceled. Press [green]any key[/] to return...");
