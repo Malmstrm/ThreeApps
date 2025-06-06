@@ -197,23 +197,28 @@ public class ShapeRunner : IApp
 
             case ShapeType.Triangle:
                 {
-                    double oldA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
-                    double oldB = existing.Parameters.First(p => p.ParameterType == ParameterType.SideB).Value;
-                    double oldC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
+                    double oldSideA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
+                    double oldBas = existing.Parameters.First(p => p.ParameterType == ParameterType.SideB).Value;
+                    double oldSideC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
+                    double oldHeight = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
 
                     var aStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side A[/] (default: {oldA}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side A[/] (default: {oldSideA}):").AllowEmpty());
                     var bStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side B[/] (default: {oldB}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side B[/] (default: {oldBas}):").AllowEmpty());
                     var cStr = AnsiConsole.Prompt(
-                        new TextPrompt<string>($"Enter [green]side C[/] (default: {oldC}):").AllowEmpty());
+                        new TextPrompt<string>($"Enter [green]side C[/] (default: {oldSideC}):").AllowEmpty());
+                    var hStr = AnsiConsole.Prompt(
+                        new TextPrompt<string>($"Enter [green]side C[/] (default: {oldHeight}):").AllowEmpty());
 
-                    double a = string.IsNullOrWhiteSpace(aStr) ? oldA : double.Parse(aStr);
-                    double b = string.IsNullOrWhiteSpace(bStr) ? oldB : double.Parse(bStr);
-                    double c = string.IsNullOrWhiteSpace(cStr) ? oldC : double.Parse(cStr);
+                    double a = string.IsNullOrWhiteSpace(aStr) ? oldSideA : double.Parse(aStr);
+                    double b = string.IsNullOrWhiteSpace(bStr) ? oldBas : double.Parse(bStr);
+                    double c = string.IsNullOrWhiteSpace(cStr) ? oldSideC : double.Parse(cStr);
+                    double h = string.IsNullOrWhiteSpace(cStr) ? oldHeight : double.Parse(cStr);
 
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideA, Value = a });
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideB, Value = b });
+                    newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = c });
                     newParams.Add(new ParameterDTO { ParameterType = ParameterType.SideC, Value = c });
                 }
                 break;
