@@ -129,11 +129,9 @@ public class ShapeRunner : IApp
         }
         catch (OperationCanceledException)
         {
-            // Användaren skrev "cancel" i ReadDouble → gå tillbaka till menyn
             return;
         }
 
-        // 3) Skicka till service och visa resultat…
         var cmd = new CreateShapeCommand(shapeType, paramList);
         var dto = _service.CreateAsync(cmd).Result;
 
@@ -153,8 +151,10 @@ public class ShapeRunner : IApp
         ShowAll();
         Console.WriteLine();
 
+        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of the record to update (or type 'cancel' to return):");
+        if (string.Equals(idText?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase))
+            return;
 
-        var idText = AnsiConsole.Ask<string>("Enter [green]Id[/] of the record to update:");
         if (!int.TryParse(idText, out int id))
         {
             AnsiConsole.MarkupLine("[red]Invalid Id.[/]");
@@ -162,7 +162,6 @@ public class ShapeRunner : IApp
             Console.ReadKey(true);
             return;
         }
-
 
         var existing = _service.GetByIdAsyc(id).Result;
         if (existing is null)
@@ -180,14 +179,17 @@ public class ShapeRunner : IApp
         {
             case ShapeType.Rectangle:
                 {
-                    AnsiConsole.MarkupLine("Rectangle – enter new values or press Enter to keep defaults:");
+                    AnsiConsole.MarkupLine("Rectangle – enter new values or press Enter to keep defaults (type 'cancel' to abort):");
                     double oldW = existing.Parameters.First(p => p.ParameterType == ParameterType.Width).Value;
                     double oldH = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
 
                     var wStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Width (default: {oldW}):").AllowEmpty());
+                    if (string.Equals(wStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var hStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Height (default: {oldH}):").AllowEmpty());
+                    if (string.Equals(hStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
 
                     double w = string.IsNullOrWhiteSpace(wStr) ? oldW : double.Parse(wStr);
                     double h = string.IsNullOrWhiteSpace(hStr) ? oldH : double.Parse(hStr);
@@ -199,17 +201,22 @@ public class ShapeRunner : IApp
 
             case ShapeType.Parallelogram:
                 {
-                    AnsiConsole.MarkupLine("Parallelogram – enter new values or press Enter to keep defaults:");
+                    AnsiConsole.MarkupLine("Parallelogram – enter new values or press Enter to keep defaults (type 'cancel' to abort):");
                     double oldA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
                     double oldB = existing.Parameters.First(p => p.ParameterType == ParameterType.SideB).Value;
                     double oldH = existing.Parameters.First(p => p.ParameterType == ParameterType.Height).Value;
 
                     var aStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Side A (default: {oldA}):").AllowEmpty());
+                    if (string.Equals(aStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var bStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Side B (default: {oldB}):").AllowEmpty());
+                    if (string.Equals(bStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var hStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Height (default: {oldH}):").AllowEmpty());
+                    if (string.Equals(hStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
 
                     double sideA = string.IsNullOrWhiteSpace(aStr) ? oldA : double.Parse(aStr);
                     double sideB = string.IsNullOrWhiteSpace(bStr) ? oldB : double.Parse(bStr);
@@ -223,7 +230,7 @@ public class ShapeRunner : IApp
 
             case ShapeType.Triangle:
                 {
-                    AnsiConsole.MarkupLine("Triangle – enter new values or press Enter to keep defaults:");
+                    AnsiConsole.MarkupLine("Triangle – enter new values or press Enter to keep defaults (type 'cancel' to abort):");
                     double oldSideA = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
                     double oldBas = existing.Parameters.First(p => p.ParameterType == ParameterType.Base).Value;
                     double oldSideC = existing.Parameters.First(p => p.ParameterType == ParameterType.SideC).Value;
@@ -231,12 +238,19 @@ public class ShapeRunner : IApp
 
                     var aStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Side A (default: {oldSideA}):").AllowEmpty());
+                    if (string.Equals(aStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var bStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Base   (default: {oldBas}):").AllowEmpty());
+                    if (string.Equals(bStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var cStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Side C (default: {oldSideC}):").AllowEmpty());
+                    if (string.Equals(cStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var hStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Height (default: {oldHeight}):").AllowEmpty());
+                    if (string.Equals(hStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
 
                     double sideA = string.IsNullOrWhiteSpace(aStr) ? oldSideA : double.Parse(aStr);
                     double bas = string.IsNullOrWhiteSpace(bStr) ? oldBas : double.Parse(bStr);
@@ -252,17 +266,22 @@ public class ShapeRunner : IApp
 
             case ShapeType.Rhombus:
                 {
-                    AnsiConsole.MarkupLine("Rhombus – enter new values or press Enter to keep defaults:");
+                    AnsiConsole.MarkupLine("Rhombus – enter new values or press Enter to keep defaults (type 'cancel' to abort):");
                     double oldD1 = existing.Parameters.First(p => p.ParameterType == ParameterType.Diagonal1).Value;
                     double oldD2 = existing.Parameters.First(p => p.ParameterType == ParameterType.Diagonal2).Value;
                     double oldSide = existing.Parameters.First(p => p.ParameterType == ParameterType.SideA).Value;
 
                     var d1Str = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Diagonal 1 (default: {oldD1}):").AllowEmpty());
+                    if (string.Equals(d1Str?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var d2Str = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Diagonal 2 (default: {oldD2}):").AllowEmpty());
+                    if (string.Equals(d2Str?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
+
                     var sStr = AnsiConsole.Prompt(
                         new TextPrompt<string>($"Side length (default: {oldSide}):").AllowEmpty());
+                    if (string.Equals(sStr?.Trim(), "cancel", StringComparison.OrdinalIgnoreCase)) return;
 
                     double d1 = string.IsNullOrWhiteSpace(d1Str) ? oldD1 : double.Parse(d1Str);
                     double d2 = string.IsNullOrWhiteSpace(d2Str) ? oldD2 : double.Parse(d2Str);
