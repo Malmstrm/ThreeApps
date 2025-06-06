@@ -18,17 +18,38 @@ public class RpsService : IRpsService
     }
     public async Task<RpsGameDTO> PlayAsync(PlayRpsCommand cmd, CancellationToken ct = default)
     {
+
         var cpuMove = (RPSMove)_rng.Next(0, 3);
         var outcome = Evaluate(cmd.PlayerMove, cpuMove);
 
-        var game = new RPSGame()
+
+        var last = await _repo.GetLastestAsync(ct);
+
+
+        int prevGames = last?.Games ?? 0;
+        int prevWins = last?.Wins ?? 0;
+        int prevLosses = last?.Losses ?? 0;
+        int prevTies = last?.Ties ?? 0;
+
+
+        int newGames = prevGames + 1;
+        int newWins = prevWins + (outcome == GameOutcome.Win ? 1 : 0);
+        int newLosses = prevLosses + (outcome == GameOutcome.Lose ? 1 : 0);
+        int newTies = prevTies + (outcome == GameOutcome.Draw ? 1 : 0);
+
+
+        var game = new RPSGame
         {
             PlayerMove = cmd.PlayerMove,
             ComputerMove = cpuMove,
-            Outcome = outcome
+            Outcome = outcome,
+            Games = newGames,
+            Wins = newWins,
+            Losses = newLosses,
+            Ties = newTies
         };
 
-        await _repo.AddAsync(game);
+        await _repo.AddAsync(game, ct);
 
         return _mapper.Map<RpsGameDTO>(game);
     }
@@ -40,10 +61,10 @@ public class RpsService : IRpsService
 
     public async Task<double> GetWinRateAsync(CancellationToken ct = default)
     {
-        var total = await _repo.CountAsync(_ => true, ct);
-        if(total == 0) return 0;
-        var wins = await _repo.CountAsync(g => g.Outcome == GameOutcome.Win, ct);
-        return wins / (double)total;
+        var last = await _repo.GetLastestAsync(ct);
+        if (last == null || last.Games == 0)
+            return 0.0;
+        return last.Wins / (double)last.Games;
     }
     private static GameOutcome Evaluate(RPSMove p, RPSMove c) => (p, c) switch
     {
