@@ -1,4 +1,4 @@
-hreeApps – komplett .NET 9-svit
+ThreeApps – komplett .NET 9-svit
 
 Shapes • Calculator • Rock Paper Scissors
 
