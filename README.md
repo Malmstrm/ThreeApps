@@ -1,130 +1,159 @@
-ThreeApps – komplett .NET 9
+hreeApps – komplett .NET 9-svit
+
 Shapes • Calculator • Rock Paper Scissors
 
-använder Entity Framework Core (Code-First)
-
-följer ren arkitektur-tänk (Domain → Application → Infrastructure → UI)
-
-injicerar beroenden med Autofac
-
-simpel renderar färg, menyer och tabeller via Spectre.Console
-
-stöder CRUD-operationer, modern input-validering och “Esc/Cancel” i alla menyer
-
+En konsolsvit som visar ren arkitektur, EF Core (Code-First), Autofac för DI och Spectre.Console för ett trevligt terminal-UI. Stöd för CRUD, modern input-validering och Esc/Cancel i alla menyer.
 
 Innehåll
-Avsnitt	Innehåll
-1. Förkrav	
-2. Katalogstruktur	
-3. Kom-igång	
-4. Databas & seed	
-5. Bygga & köra	
-6. Använda apparna	
-7. Arkitektur & teknikval	
-8. Viktiga designmönster	
 
-1. Förkrav
+Funktioner i korthet
 
-.NET SDK	9.0-
-SQL Server
-Git	valfri	för klon & commits
-(Windows Terminal)	valfri	ger snygg ANSI-färg
+Förkrav
 
-2. Katalogstruktur
-bash
-Kopiera
-Redigera
+Katalogstruktur
+
+Kom-igång
+
+Databas & seed
+
+Bygga & köra
+
+Använda apparna
+
+Arkitektur & teknikval
+
+Viktiga designmönster
+
+Felsökning
+
+Funktioner i korthet
+
+✅ .NET 9 konsolappar (3 st) under en lösning
+
+✅ EF Core (Code-First) med auto-migrering och seed-data
+
+✅ Clean Architecture (Domain → Application → Infrastructure → UI)
+
+✅ Autofac för beroendeinjektion
+
+✅ Spectre.Console: färg, tabeller, menyer
+
+✅ CRUD, robust validering och Esc/Cancel i alla steg
+
+Förkrav
+
+.NET SDK 9.0
+
+SQL Server (LocalDB/Express funkar fint)
+
+Git (för klon & commits)
+
+Windows Terminal (valfritt men snygg ANSI-färg gör livet gladare)
+
+Katalogstruktur
+
 ThreeApps/
+├─ ThreeApps.sln
 │
-├── ThreeApps.sln
+├─ Domain/                         # Endast POCO-entiteter + BaseEntity
+│  └─ Entities/                    # RpsGame, ShapeCalculation, CalculatorCalculation, ...
 │
-├── Domain/                 # Enbart POCO-entiteter + basklass BaseEntity
-│   └── Entities/           # RPSGame, ShapeCalculation, CalculatorCalculation …
+├─ Shared/                         # Enums, interfaces, NavigationService, helpers
 │
-├── Shared/                 # Enums, interface, NavigationService, helpers
+├─ Application/                    # DTOs, Commands, MappingProfiles, Services
+│  ├─ Interfaces/                  # IRpsService, IShapeService, ICalculatorService, ...
+│  └─ Services/                    # Affärslogik (Strategy + Guard Clauses)
 │
-├── Application/            # DTOs, Commands, MappingProfiles, Services
-│   ├── Interfaces/         # IRpsService, IShapeService, ICalculatorService
-│   └── Services/           # business-logik (Strategy + Guard Clauses)
+├─ Infrastructure/
+│  ├─ Data/                        # AppDbContext, DataInitializer, Migrations
+│  └─ Repositories/                # Generisk repo + RpsRepository, ShapeRepository, ...
 │
-├── Infrastructure/
-│   ├── Data/               # AppDbContext, DataInitializer, migrations
-│   └── Repositories/       # generiska + RpsRepository, ShapeRepository …
-│
-├── MainMenu/               # Start-projekt, Autofac-bootstrap, MenuRunner
-│
-├── RPS/                    # Rock Paper Scissors-runner
-├── Shape/                  # Shape-runner
-└── Calculator/             # Calculator-runner
+├─ MainMenu/                       # Startprojekt (Autofac-bootstrapping, MenuRunner)
+├─ RPS/                            # Rock Paper Scissors-runner
+├─ Shape/                          # Shape-runner
+└─ Calculator/                     # Calculator-runner
 
-4. Kom-igång
+Kom-igång
 
-clone https://github.com/<ditt-konto>/ThreeApps.git
+1. Kloning
+   git clone https://github.com/<org-eller-användare>/ThreeApps.git
+   cd ThreeApps
+   
+2. Anslutningssträng
+Öppna MainMenu/appsettings.json och uppdatera vid behov:
+{
+  "ConnectionStrings": {
+    "Default": "Server=.;Database=ThreeAppsDb;Trusted_Connection=True;TrustServerCertificate=True;"
+  }
+}
 
-# justera anslutningssträng (MainMenu/appsettings.json):
-# "Server=.;Database=ThreeAppsDb;Trusted_Connection=True;TrustServerCertificate=True;"
-4. Databas & seed
-Migrationer ligger i Infrastructure/Data/Migrations.
+Databas & seed
 
-Vid första uppstart körs:
+Migrationer finns under Infrastructure/Data/Migrations.
 
-db.Database.Migrate();      // skapar / uppgraderar schema
-DataInitializer.Seed(db);   // lägger 4 Shapes + 6 Calculator-poster
+Vid första uppstart körs automatiskt:
+db.Database.Migrate();       // skapar/uppgraderar schema
+DataInitializer.Seed(db);    // lägger in 4 Shapes + 6 Calculator-poster
 
-5. Bygga & köra	
+Använda apparna
+1) Rock Paper Scissors (RPS)
 
-> RPS - Rock, Paper & Scissors
-  Shape - Shape Calculator
-  Calc - Calculator
-  Exit - Exit
-Navigera med ↑/↓ + Enter, eller tryck Esc för att backa.
+Play: välj Rock/Paper/Scissors → resultat sparas → resultatpanel visas.
 
-6. Använda apparna
-6.1 Rock Paper Scissors
-Val	Funktion
-Play	välj Rock/Paper/Scissors → spelet sparas, resultatpanel visas
-History	paginerad tabell med datum, drag, utfall, kumulativt känt Win/Loss/Tie
-Esc	tillbaka till Main Menu
+History: paginerad tabell med datum, drag, utfall samt kumulativ Win/Loss/Tie.
 
-6.2 Shape Calculator
+Esc: tillbaka till Main Menu.
+
+2) Shape Calculator
+
+Stöd för Rectangle, Parallelogram, Triangle (A, B, C, Height) och Rhombus.
+
 Val	Beskrivning
-New Calculation	välj form → mata in dimensioner → Area & Perimeter sparas
-List All	Spectre-tabell med Id, Datum, Form, Area, Perimeter, parametrar
-Update	ange Id → redigera valfria fält (tom input = behåll)
-Delete	ange Id → bekräfta borttag
-Esc	tillbaka
+New Calculation	Välj form → mata in dimensioner → Area & Perimeter beräknas och sparas.
+List All	Tabell med Id, Datum, Form, Area, Perimeter och parametrar.
+Update	Ange Id → redigera valfria fält (tom input = behåll).
+Delete	Ange Id → bekräfta borttag.
+Esc	Tillbaka.
+3) Calculator
 
-Stöd för: Rectangle, Parallelogram, Triangle (A, B, C, Height) och Rhombus.
+Operatorer: + − * / √ %
 
-6.3 Calculator
 Val	Beskrivning
-New Calculation	tal 1 → operator ( +, −, *, /, √, % ) → tal 2 (om behövs)
-Division/Modulus by 0 stoppar och ber användaren korrigera.
-List All	tabell med historik
-Update	ange Id → ändra A, operator, B (guards mot bokstäver & noll-division)
-Delete	ange Id → bekräfta
-Esc	tillbaka
+New Calculation	Tal A → operator → Tal B (om behövs). Division/Modulus by 0 stoppas och ber om korrigering.
+List All	Historik i tabell.
+Update	Ange Id → ändra A, operator, B (guards mot bokstäver & noll-division).
+Delete	Ange Id → bekräfta.
+Esc	Tillbaka.
 
-Skriv cancel på vilken prompt som helst för att avbryta och gå tillbaka.
+💡 Tips: Skriv cancel på valfri prompt för att avbryta och gå tillbaka.
 
-7. Arkitektur & teknikval
+Arkitektur & teknikval
+Lager & referenser
 Lager	Syfte	Referenser
-Domain	Kärna (ingen beroende på andra lager)	—
-Application	DTOs + affärslogik (Services)	Domain, Shared
-Infrastructure	Databas, Repositories	Domain, Application
-UI (MainMenu, Shape, Calculator, RPS)	Presentation/Console	Application, Shared, Infrastructure (via DI)
-
-
+Domain	Kärna: entiteter, regler nära datat	—
+Application	DTOs, mapping, tjänster/affärslogik	Domain, Shared
+Infrastructure	Databas, repos, EF Core	Domain, Application
+UI (MainMenu, Shape, Calculator, RPS)	Presentation (Console)	Application, Shared, Infrastructure (via DI)
+Paket
 Paket	Version	Användning
 Microsoft.EntityFrameworkCore	9.0.5	ORM
-Microsoft.EntityFrameworkCore.SqlServer	9.0.5	SQL Server provider
+Microsoft.EntityFrameworkCore.SqlServer	9.0.5	SQL Server-provider
 Autofac.Extensions.DependencyInjection	9.0.0	DI-container
-Spectre.Console	0.47	Färgrik CLI-UI
-AutoMapper	13	Entitet ⇆ DTO-mapping
+Spectre.Console	0.47	Färgrikt CLI-UI
+AutoMapper	13.x	Entitet ⇆ DTO-mapping
 
-8. Viktiga designmönster
-Kort beskrivning
-Repository	Infrastructure/Repositories/*Repository.cs	Isolerar datalager från Application-logik
-Strategy	Application/Services (olika switch beroende på ShapeType, CalculatorOperator)	Väljer beräkningsstrategi utifrån typ/­operator
-Dependency Injection	Konfigureras i MainMenu/Program.cs	Autofac registrerar NavigationService, Services, Repositories
-Guard Clauses	TryReadDouble, division-by-zero check, null/empty checks	Stoppar otillåtna värden tidigt
+(Versionerna speglar nuvarande projekt; uppgradera fritt när du vill leva farligt.)
+
+Viktiga designmönster
+
+Repository (Infrastructure/Repositories/*Repository.cs)
+Isolerar datalager från applikationslogik.
+
+Strategy (Application/Services)
+Väljer beräkningsstrategi utifrån ShapeType/CalculatorOperator.
+
+Dependency Injection (registreras i MainMenu/Program.cs)
+Autofac bygger container och registrerar NavigationService, Services & Repositories.
+
+Guard Clauses
+TryReadDouble, noll-divisionsskydd, null/empty-checks – fel stoppas tidigt.
